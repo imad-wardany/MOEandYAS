@@ -14,6 +14,7 @@
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --success: #10b981;
+      --warning: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -22,8 +23,8 @@
 
     header {
       text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-color);
     }
     header h1 {
@@ -38,34 +39,36 @@
       text-overflow: ellipsis;
     }
 
-    .stats-bar { display: flex; gap: 10px; margin-bottom: 16px; }
+    /* Compact Top Statistics Cards */
+    .stats-bar { display: flex; gap: 8px; margin-bottom: 14px; }
     .stat-card {
       flex: 1; background: var(--card-bg); border: 1px solid var(--border-color);
-      padding: 12px; border-radius: 10px; text-align: center;
+      padding: 6px 8px; border-radius: 8px; text-align: center;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
-    .stat-card .num { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
-    .stat-card .label { font-size: 0.8rem; color: var(--text-muted); }
+    .stat-card .num { font-size: 1.25rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
+    .stat-card .label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
     /* Attendance Progress Bar */
     .progress-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
     }
     .progress-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .progress-header span:first-child { font-weight: 600; color: var(--text-main); }
     .progress-track {
       width: 100%;
-      height: 10px;
+      height: 8px;
       background-color: var(--bg-color);
       border-radius: 6px;
       overflow: hidden;
@@ -78,8 +81,9 @@
       transition: width 0.4s ease-in-out;
     }
 
-    .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-box { flex: 1; min-width: 200px; }
+    /* Controls Layout */
+    .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .search-box { width: 100%; }
     
     input[type="text"] {
       width: 100%; padding: 12px 14px; background-color: var(--card-bg);
@@ -88,11 +92,15 @@
     }
     input[type="text"]:focus { border-color: var(--primary); }
 
+    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn {
-      background-color: var(--primary); color: white; border: none;
-      padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      flex: 1; min-width: 140px; background-color: var(--primary); color: white; border: none;
+      padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      text-align: center;
     }
     .btn-secondary { background-color: #334155; color: var(--text-main); }
+    .btn-filter { background-color: #334155; color: var(--text-muted); border: 1px solid var(--border-color); }
+    .btn-filter.active { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: rgba(245, 158, 11, 0.5); }
 
     .tables-list { display: flex; flex-direction: column; gap: 14px; }
     .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
@@ -101,18 +109,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px;
+      padding: 14px 16px;
       cursor: pointer;
       user-select: none;
       background-color: var(--card-bg);
       transition: background-color 0.2s;
     }
     .table-header:hover { background-color: rgba(255, 255, 255, 0.03); }
-    .table-badge { background: #312e81; color: #a5b4fc; padding: 4px 12px; border-radius: 20px; font-size: 1.1rem; font-weight: bold; }
+    .table-badge { background: #312e81; color: #a5b4fc; padding: 4px 12px; border-radius: 20px; font-size: 1rem; font-weight: bold; }
 
-    .table-header-info { display: flex; align-items: center; gap: 12px; }
+    .table-header-info { display: flex; align-items: center; gap: 10px; }
     .chevron-icon {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
       transition: transform 0.3s ease;
     }
@@ -130,7 +138,7 @@
     .table-card.expanded .guest-list { display: flex; }
 
     .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
-    .guest-name { font-size: 1.05rem; font-weight: 500; }
+    .guest-name { font-size: 1rem; font-weight: 500; }
 
     .check-btn {
       background-color: #334155; color: var(--text-muted); border: none;
@@ -175,12 +183,15 @@
       </div>
     </div>
 
-    <!-- Search Box & Control Buttons -->
+    <!-- Search Box & Action Controls -->
     <div class="controls">
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="ابحث باسم الضيف أو رقم الطاولة..." oninput="renderApp()">
       </div>
-      <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
+      <div class="action-buttons">
+        <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
+        <button class="btn btn-filter" id="filterAbsentBtn" onclick="toggleAbsentFilter()">عرض الغائبين فقط</button>
+      </div>
     </div>
 
     <!-- Main Dynamic Tables List -->
@@ -211,6 +222,7 @@
     let currentGuests = {};
     let expandedTables = new Set();
     let allExpandedState = false;
+    let showOnlyAbsent = false;
 
     // Listen for live database updates
     onValue(guestsRef, (snapshot) => {
@@ -250,6 +262,12 @@
       renderApp();
     };
 
+    // Toggle non-attended visitors filter
+    window.toggleAbsentFilter = () => {
+      showOnlyAbsent = !showOnlyAbsent;
+      renderApp();
+    };
+
     // Render the user interface
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -271,17 +289,30 @@
       document.getElementById('progressRatio').textContent = `${seatedCount} من ${totalCount} (${progressPercent}%)`;
       document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
 
-      // Update Expand/Collapse button label
+      // Update buttons UI
       const toggleBtn = document.getElementById('toggleAllBtn');
       if (toggleBtn) {
         toggleBtn.textContent = allExpandedState ? 'طي الكل' : 'توسيع الكل';
       }
 
-      // Group guests by table
+      const absentBtn = document.getElementById('filterAbsentBtn');
+      if (absentBtn) {
+        if (showOnlyAbsent) {
+          absentBtn.classList.add('active');
+          absentBtn.textContent = '✕ إلغاء الفلتر (عرض الكل)';
+        } else {
+          absentBtn.classList.remove('active');
+          absentBtn.textContent = 'عرض الغائبين فقط';
+        }
+      }
+
+      // Group and filter guests
       const grouped = {};
       guestArray.forEach(g => {
         const matchSearch = g.name.toLowerCase().includes(query) || g.table.toLowerCase().includes(query);
-        if (matchSearch) {
+        const matchAbsent = !showOnlyAbsent || !g.seated;
+
+        if (matchSearch && matchAbsent) {
           if (!grouped[g.table]) grouped[g.table] = [];
           grouped[g.table].push(g);
         }
@@ -297,14 +328,15 @@
 
       listContainer.innerHTML = sortedTables.map(tableNum => {
         const isExpanded = isSearching || expandedTables.has(tableNum);
-        const seatedInTable = grouped[tableNum].filter(g => g.seated).length;
+        const totalInTable = currentGuests ? Object.values(currentGuests).filter(g => g.table === tableNum).length : grouped[tableNum].length;
+        const seatedInTable = currentGuests ? Object.values(currentGuests).filter(g => g.table === tableNum && g.seated).length : 0;
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${grouped[tableNum].length} ضيوف</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} ضيوف</span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
