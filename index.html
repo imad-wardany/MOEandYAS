@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding of Mohammad and Yasmine</title>
+  <title>Mohammad & Yasmine</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -26,9 +26,19 @@
       padding-bottom: 15px;
       border-bottom: 1px solid var(--border-color);
     }
-    header h1 { font-size: 1.6rem; color: #38bdf8; margin-bottom: 4px; }
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-    .stats-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+    .stats-bar { display: flex; gap: 10px; margin-bottom: 16px; }
     .stat-card {
       flex: 1; background: var(--card-bg); border: 1px solid var(--border-color);
       padding: 12px; border-radius: 10px; text-align: center;
@@ -36,8 +46,40 @@
     .stat-card .num { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
     .stat-card .label { font-size: 0.8rem; color: var(--text-muted); }
 
+    /* Attendance Progress Bar */
+    .progress-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .progress-header span:first-child { font-weight: 600; color: var(--text-main); }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background-color: var(--bg-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      border-radius: 6px;
+      transition: width 0.4s ease-in-out;
+    }
+
     .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-box { flex: 1; min-width: 240px; }
+    .search-box { flex: 1; min-width: 200px; }
     
     input[type="text"] {
       width: 100%; padding: 12px 14px; background-color: var(--card-bg);
@@ -50,14 +92,43 @@
       background-color: var(--primary); color: white; border: none;
       padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
     }
-    .btn-secondary { background-color: #334155; }
+    .btn-secondary { background-color: #334155; color: var(--text-main); }
 
     .tables-list { display: flex; flex-direction: column; gap: 14px; }
-    .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; }
-    .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed var(--border-color); }
+    .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+    
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      cursor: pointer;
+      user-select: none;
+      background-color: var(--card-bg);
+      transition: background-color 0.2s;
+    }
+    .table-header:hover { background-color: rgba(255, 255, 255, 0.03); }
     .table-badge { background: #312e81; color: #a5b4fc; padding: 4px 12px; border-radius: 20px; font-size: 1.1rem; font-weight: bold; }
 
-    .guest-list { display: flex; flex-direction: column; gap: 8px; }
+    .table-header-info { display: flex; align-items: center; gap: 12px; }
+    .chevron-icon {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+    }
+    .table-card.expanded .chevron-icon { transform: rotate(180deg); }
+
+    .guest-list {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 16px 16px 16px;
+      border-top: 1px dashed var(--border-color);
+      margin-top: 4px;
+      padding-top: 12px;
+    }
+    .table-card.expanded .guest-list { display: flex; }
+
     .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
     .guest-name { font-size: 1.05rem; font-weight: 500; }
 
@@ -81,7 +152,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>Wedding of Mohammad and Yasmine</h1>
+      <h1>Mohammad & Yasmine</h1>
     </header>
 
     <div class="stats-bar">
@@ -99,10 +170,22 @@
       </div>
     </div>
 
+    <!-- Attendance Progress Bar -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span>الحاضرون من إجمالي الضيوف</span>
+        <span id="progressRatio">0 / 0 (0%)</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressBarFill"></div>
+      </div>
+    </div>
+
     <div class="controls">
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="ابحث باسم الضيف أو رقم الطاولة..." oninput="renderApp()">
       </div>
+      <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
       <button class="btn" onclick="openModal()">+ إضافة ضيف</button>
     </div>
 
@@ -152,8 +235,9 @@
     const guestsRef = ref(db, 'guests');
 
     let currentGuests = {};
+    let expandedTables = new Set();
+    let allExpandedState = false;
 
-    // Live real-time synchronization across all devices
     onValue(guestsRef, (snapshot) => {
       const data = snapshot.val();
       currentGuests = data || {};
@@ -177,16 +261,52 @@
       closeModal();
     };
 
+    window.toggleTable = (tableNum) => {
+      if (expandedTables.has(tableNum)) {
+        expandedTables.delete(tableNum);
+      } else {
+        expandedTables.add(tableNum);
+      }
+      renderApp();
+    };
+
+    window.toggleAllTables = () => {
+      const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
+      const uniqueTables = [...new Set(guestArray.map(g => g.table))];
+
+      if (allExpandedState) {
+        expandedTables.clear();
+        allExpandedState = false;
+      } else {
+        uniqueTables.forEach(t => expandedTables.add(t));
+        allExpandedState = true;
+      }
+      renderApp();
+    };
+
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
       const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
 
-      document.getElementById('totalGuests').textContent = guestArray.length;
-      document.getElementById('seatedGuests').textContent = guestArray.filter(g => g.seated).length;
+      const totalCount = guestArray.length;
+      const seatedCount = guestArray.filter(g => g.seated).length;
+      const progressPercent = totalCount > 0 ? Math.round((seatedCount / totalCount) * 100) : 0;
+
+      document.getElementById('totalGuests').textContent = totalCount;
+      document.getElementById('seatedGuests').textContent = seatedCount;
       
       const uniqueTables = [...new Set(guestArray.map(g => g.table))];
       document.getElementById('totalTables').textContent = uniqueTables.length;
+
+      document.getElementById('progressRatio').textContent = `${seatedCount} من ${totalCount} (${progressPercent}%)`;
+      document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
+
+      // Update Expand/Collapse All Button Text
+      const toggleBtn = document.getElementById('toggleAllBtn');
+      if (toggleBtn) {
+        toggleBtn.textContent = allExpandedState ? 'طي الكل' : 'توسيع الكل';
+      }
 
       const grouped = {};
       guestArray.forEach(g => {
@@ -197,6 +317,9 @@
         }
       });
 
+      // Automatically expand tables when typing in the search box
+      const isSearching = query.length > 0;
+
       const sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
 
       if (sortedTables.length === 0) {
@@ -204,24 +327,32 @@
         return;
       }
 
-      listContainer.innerHTML = sortedTables.map(tableNum => `
-        <div class="table-card">
-          <div class="table-header">
-            <span class="table-badge">طاولة رقم ${tableNum}</span>
-            <span style="font-size:0.85rem; color:var(--text-muted);">${grouped[tableNum].length} ضيوف</span>
-          </div>
-          <div class="guest-list">
-            ${grouped[tableNum].map(g => `
-              <div class="guest-item">
-                <span class="guest-name">${g.name}</span>
-                <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="toggleSeated('${g.id}')">
-                  ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
-                </button>
+      listContainer.innerHTML = sortedTables.map(tableNum => {
+        const isExpanded = isSearching || expandedTables.has(tableNum);
+        const seatedInTable = grouped[tableNum].filter(g => g.seated).length;
+
+        return `
+          <div class="table-card ${isExpanded ? 'expanded' : ''}">
+            <div class="table-header" onclick="toggleTable('${tableNum}')">
+              <span class="table-badge">طاولة رقم ${tableNum}</span>
+              <div class="table-header-info">
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${grouped[tableNum].length} ضيوف</span>
+                <span class="chevron-icon">▼</span>
               </div>
-            `).join('')}
+            </div>
+            <div class="guest-list">
+              ${grouped[tableNum].map(g => `
+                <div class="guest-item">
+                  <span class="guest-name">${g.name}</span>
+                  <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}')">
+                    ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
+                  </button>
+                </div>
+              `).join('')}
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     };
 
     window.openModal = () => document.getElementById('guestModal').classList.add('active');
