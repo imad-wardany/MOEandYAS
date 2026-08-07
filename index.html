@@ -19,7 +19,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-main); padding: 16px; min-height: 100vh; }
-    .container { max-width: 800px; margin: 0 auto; }
+    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; min-height: calc(100vh - 32px); }
 
     header {
       text-align: center;
@@ -102,7 +102,7 @@
     .btn-filter { background-color: #334155; color: var(--text-muted); border: 1px solid var(--border-color); }
     .btn-filter.active { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: rgba(245, 158, 11, 0.5); }
 
-    .tables-list { display: flex; flex-direction: column; gap: 14px; }
+    .tables-list { display: flex; flex-direction: column; gap: 14px; flex-grow: 1; }
     .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
     
     .table-header {
@@ -146,6 +146,17 @@
     }
     .check-btn.seated {
       background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    /* Footer Styles */
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      direction: ltr;
     }
   </style>
 </head>
@@ -198,6 +209,11 @@
     <div class="tables-list" id="tablesList">
       <div style="text-align:center; padding:30px; color:var(--text-muted);">جاري تحميل البيانات المباشرة...</div>
     </div>
+
+    <!-- Footer Section -->
+    <footer>
+      Copyright © Imad Al Wardany +96179104792
+    </footer>
   </div>
 
   <!-- Firebase Integration Script -->
