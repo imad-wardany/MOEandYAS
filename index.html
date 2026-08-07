@@ -1,13 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wedding of Mohammad and Yasmine</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4f46e5">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     :root {
       --bg-color: #0f172a;
@@ -18,7 +14,6 @@
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --success: #10b981;
-      --accent: #f43f5e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -33,119 +28,51 @@
     }
     header h1 { font-size: 1.6rem; color: #38bdf8; margin-bottom: 4px; }
 
-    .stats-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+    .stats-bar { display: flex; gap: 10px; margin-bottom: 20px; }
     .stat-card {
-      flex: 1;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 12px;
-      border-radius: 10px;
-      text-align: center;
+      flex: 1; background: var(--card-bg); border: 1px solid var(--border-color);
+      padding: 12px; border-radius: 10px; text-align: center;
     }
     .stat-card .num { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
     .stat-card .label { font-size: 0.8rem; color: var(--text-muted); }
 
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    .search-box { flex: 1; min-width: 240px; position: relative; }
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .search-box { flex: 1; min-width: 240px; }
     
-    input[type="text"], select, textarea {
-      width: 100%;
-      padding: 12px 14px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-main);
-      font-size: 1rem;
-      outline: none;
+    input[type="text"] {
+      width: 100%; padding: 12px 14px; background-color: var(--card-bg);
+      border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);
+      font-size: 1rem; outline: none;
     }
-    input[type="text"]:focus, select:focus { border-color: var(--primary); }
+    input[type="text"]:focus { border-color: var(--primary); }
 
     .btn {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
+      background-color: var(--primary); color: white; border: none;
+      padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
     }
-    .btn:hover { background-color: var(--primary-hover); }
     .btn-secondary { background-color: #334155; }
 
     .tables-list { display: flex; flex-direction: column; gap: 14px; }
-    
-    .table-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-    }
-    
-    .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed var(--border-color);
-    }
-    .table-badge {
-      background: #312e81;
-      color: #a5b4fc;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 1.1rem;
-      font-weight: bold;
-    }
+    .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; }
+    .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed var(--border-color); }
+    .table-badge { background: #312e81; color: #a5b4fc; padding: 4px 12px; border-radius: 20px; font-size: 1.1rem; font-weight: bold; }
 
     .guest-list { display: flex; flex-direction: column; gap: 8px; }
-    
-    .guest-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 10px 14px;
-      border-radius: 8px;
-    }
+    .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
     .guest-name { font-size: 1.05rem; font-weight: 500; }
-    .guest-name mark { background: #f59e0b; color: #000; padding: 0 2px; border-radius: 2px; }
 
     .check-btn {
-      background-color: #334155;
-      color: var(--text-muted);
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      cursor: pointer;
+      background-color: #334155; color: var(--text-muted); border: none;
+      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
     }
     .check-btn.seated {
-      background-color: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
     }
 
     .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .modal { background: var(--card-bg); width: 100%; max-width: 440px; padding: 20px; border-radius: 12px; }
@@ -160,101 +87,109 @@
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="totalGuests">0</div>
-        <div class="label">Total Guests</div>
+        <div class="label">إجمالي الضيوف</div>
       </div>
       <div class="stat-card">
         <div class="num" id="seatedGuests" style="color: var(--success);">0</div>
-        <div class="label">Seated</div>
+        <div class="label">الحاضرون</div>
       </div>
       <div class="stat-card">
         <div class="num" id="totalTables">0</div>
-        <div class="label">Total Tables</div>
+        <div class="label">عدد الطاولات</div>
       </div>
     </div>
 
     <div class="controls">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search by name or table number..." oninput="renderApp()">
+        <input type="text" id="searchInput" placeholder="ابحث باسم الضيف أو رقم الطاولة..." oninput="renderApp()">
       </div>
-      <button class="btn" onclick="openModal()">+ Add Guest</button>
+      <button class="btn" onclick="openModal()">+ إضافة ضيف</button>
     </div>
 
-    <div class="tables-list" id="tablesList"></div>
+    <div class="tables-list" id="tablesList">
+      <div style="text-align:center; padding:30px; color:var(--text-muted);">جاري تحميل البيانات المباشرة...</div>
+    </div>
   </div>
 
   <!-- Modal for Adding Guest -->
   <div class="modal-overlay" id="guestModal">
     <div class="modal">
-      <h2 style="margin-bottom: 15px;">Add New Guest</h2>
+      <h2 style="margin-bottom: 15px;">إضافة ضيف جديد</h2>
       <form onsubmit="addGuest(event)">
         <div style="margin-bottom: 12px;">
-          <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">Guest Name</label>
-          <input type="text" id="newGuestName" required placeholder="Enter full guest name">
+          <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">اسم الضيف</label>
+          <input type="text" id="newGuestName" required placeholder="أدخل اسم الضيف الكامل">
         </div>
         <div style="margin-bottom: 20px;">
-          <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">Table Number</label>
-          <input type="text" id="newTableNumber" required placeholder="e.g. 1">
+          <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">رقم الطاولة</label>
+          <input type="text" id="newTableNumber" required placeholder="مثال: 1">
         </div>
         <div style="display:flex; justify-content:flex-end; gap:8px;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn">Save</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+          <button type="submit" class="btn">حفظ</button>
         </div>
       </form>
     </div>
   </div>
 
-  <script>
-    // PRELOADED DATA - Hardcoded so every receptionist receives it instantly
-    const initialGuestList = [
-      { id: '1', name: 'عماد حسين الورداني', table: '1', seated: false },
-      { id: '2', name: 'فاروق حسين الورداني', table: '1', seated: false },
-      { id: '3', name: 'فيصل الورداني', table: '2', seated: false },
-      { id: '4', name: 'علي يحي الخطيب', table: '3', seated: false },
-      { id: '5', name: 'خالد صدقة', table: '4', seated: false }
-    ];
+  <!-- Firebase Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    const DATA_VERSION = 'v1.0';
+    const firebaseConfig = {
+      apiKey: "AIzaSyCeq1zeX7vLCHV2TjkMVannE6mOG09cESo",
+      authDomain: "wedding-moeandyas.firebaseapp.com",
+      databaseURL: "https://wedding-moeandyas-default-rtdb.firebaseio.com",
+      projectId: "wedding-moeandyas",
+      storageBucket: "wedding-moeandyas.firebasestorage.app",
+      messagingSenderId: "871063287288",
+      appId: "1:871063287288:web:475beddf326a96ad80120d"
+    };
 
-    function getData() {
-      const storedVersion = localStorage.getItem('wedding_guests_version');
-      const stored = localStorage.getItem('wedding_guests_data');
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const guestsRef = ref(db, 'guests');
 
-      // If opening for the first time or version changed, force-load the hardcoded master data
-      if (!stored || storedVersion !== DATA_VERSION) {
-        localStorage.setItem('wedding_guests_data', JSON.stringify(initialGuestList));
-        localStorage.setItem('wedding_guests_version', DATA_VERSION);
-        return initialGuestList;
-      }
-      return JSON.parse(stored);
-    }
+    let currentGuests = {};
 
-    function saveData(data) {
-      localStorage.setItem('wedding_guests_data', JSON.stringify(data));
+    // Live real-time synchronization across all devices
+    onValue(guestsRef, (snapshot) => {
+      const data = snapshot.val();
+      currentGuests = data || {};
       renderApp();
-    }
+    });
 
-    function toggleSeated(id) {
-      const data = getData();
-      const guest = data.find(g => g.id === id);
-      if (guest) {
-        guest.seated = !guest.seated;
-        saveData(data);
-      }
-    }
+    window.toggleSeated = (id) => {
+      const guestRef = ref(db, `guests/${id}`);
+      update(guestRef, { seated: !currentGuests[id].seated });
+    };
 
-    function renderApp() {
-      const data = getData();
+    window.addGuest = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('newGuestName').value.trim();
+      const table = document.getElementById('newTableNumber').value.trim();
+      if (!name || !table) return;
+
+      push(guestsRef, { name, table, seated: false });
+      document.getElementById('newGuestName').value = '';
+      document.getElementById('newTableNumber').value = '';
+      closeModal();
+    };
+
+    window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
+      const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
 
-      document.getElementById('totalGuests').textContent = data.length;
-      document.getElementById('seatedGuests').textContent = data.filter(g => g.seated).length;
+      document.getElementById('totalGuests').textContent = guestArray.length;
+      document.getElementById('seatedGuests').textContent = guestArray.filter(g => g.seated).length;
       
-      const uniqueTables = [...new Set(data.map(g => g.table))];
+      const uniqueTables = [...new Set(guestArray.map(g => g.table))];
       document.getElementById('totalTables').textContent = uniqueTables.length;
 
       const grouped = {};
-      data.forEach(g => {
+      guestArray.forEach(g => {
         const matchSearch = g.name.toLowerCase().includes(query) || g.table.toLowerCase().includes(query);
         if (matchSearch) {
           if (!grouped[g.table]) grouped[g.table] = [];
@@ -265,55 +200,32 @@
       const sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
 
       if (sortedTables.length === 0) {
-        listContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">No matching guests or tables found</div>`;
+        listContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد نتائج مطابقة</div>`;
         return;
       }
 
       listContainer.innerHTML = sortedTables.map(tableNum => `
         <div class="table-card">
           <div class="table-header">
-            <span class="table-badge">Table ${tableNum}</span>
-            <span style="font-size:0.85rem; color:var(--text-muted);">${grouped[tableNum].length} guests</span>
+            <span class="table-badge">طاولة رقم ${tableNum}</span>
+            <span style="font-size:0.85rem; color:var(--text-muted);">${grouped[tableNum].length} ضيوف</span>
           </div>
           <div class="guest-list">
             ${grouped[tableNum].map(g => `
               <div class="guest-item">
-                <span class="guest-name">${highlightText(g.name, query)}</span>
+                <span class="guest-name">${g.name}</span>
                 <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="toggleSeated('${g.id}')">
-                  ${g.seated ? '✓ Seated' : 'Check In'}
+                  ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
                 </button>
               </div>
             `).join('')}
           </div>
         </div>
       `).join('');
-    }
+    };
 
-    function highlightText(text, query) {
-      if (!query || isNaN(query) === false) return text;
-      const reg = new RegExp(`(${query})`, 'gi');
-      return text.replace(reg, '<mark>$1</mark>');
-    }
-
-    function openModal() { document.getElementById('guestModal').classList.add('active'); }
-    function closeModal() { document.getElementById('guestModal').classList.remove('active'); }
-
-    function addGuest(e) {
-      e.preventDefault();
-      const name = document.getElementById('newGuestName').value.trim();
-      const table = document.getElementById('newTableNumber').value.trim();
-      if (!name || !table) return;
-
-      const data = getData();
-      data.push({ id: Date.now().toString(), name, table, seated: false });
-      saveData(data);
-
-      document.getElementById('newGuestName').value = '';
-      document.getElementById('newTableNumber').value = '';
-      closeModal();
-    }
-
-    window.addEventListener('DOMContentLoaded', renderApp);
+    window.openModal = () => document.getElementById('guestModal').classList.add('active');
+    window.closeModal = () => document.getElementById('guestModal').classList.remove('active');
   </script>
 </body>
 </html>
