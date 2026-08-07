@@ -139,22 +139,16 @@
     .check-btn.seated {
       background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
     }
-
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7);
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
-    }
-    .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .modal { background: var(--card-bg); width: 100%; max-width: 440px; padding: 20px; border-radius: 12px; }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Header Section -->
     <header>
       <h1>Mohammad & Yasmine</h1>
     </header>
 
+    <!-- Top Statistics Summary -->
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="totalGuests">0</div>
@@ -181,44 +175,24 @@
       </div>
     </div>
 
+    <!-- Search Box & Control Buttons -->
     <div class="controls">
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="ابحث باسم الضيف أو رقم الطاولة..." oninput="renderApp()">
       </div>
       <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
-      <!--<button class="btn" onclick="openModal()">+ إضافة ضيف</button>-->
     </div>
 
+    <!-- Main Dynamic Tables List -->
     <div class="tables-list" id="tablesList">
       <div style="text-align:center; padding:30px; color:var(--text-muted);">جاري تحميل البيانات المباشرة...</div>
     </div>
   </div>
 
-  <!-- Modal for Adding Guest -->
-  <div class="modal-overlay" id="guestModal">
-    <div class="modal">
-      <h2 style="margin-bottom: 15px;">إضافة ضيف جديد</h2>
-      <form onsubmit="addGuest(event)">
-        <div style="margin-bottom: 12px;">
-          <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">اسم الضيف</label>
-          <input type="text" id="newGuestName" required placeholder="أدخل اسم الضيف الكامل">
-        </div>
-        <div style="margin-bottom: 20px;">
-          <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:4px;">رقم الطاولة</label>
-          <input type="text" id="newTableNumber" required placeholder="مثال: 1">
-        </div>
-        <div style="display:flex; justify-content:flex-end; gap:8px;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
-          <button type="submit" class="btn">حفظ</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Firebase Integration -->
+  <!-- Firebase Integration Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCeq1zeX7vLCHV2TjkMVannE6mOG09cESo",
@@ -238,29 +212,20 @@
     let expandedTables = new Set();
     let allExpandedState = false;
 
+    // Listen for live database updates
     onValue(guestsRef, (snapshot) => {
       const data = snapshot.val();
       currentGuests = data || {};
       renderApp();
     });
 
+    // Toggle guest check-in status
     window.toggleSeated = (id) => {
       const guestRef = ref(db, `guests/${id}`);
       update(guestRef, { seated: !currentGuests[id].seated });
     };
 
-    window.addGuest = (e) => {
-      e.preventDefault();
-      const name = document.getElementById('newGuestName').value.trim();
-      const table = document.getElementById('newTableNumber').value.trim();
-      if (!name || !table) return;
-
-      push(guestsRef, { name, table, seated: false });
-      document.getElementById('newGuestName').value = '';
-      document.getElementById('newTableNumber').value = '';
-      closeModal();
-    };
-
+    // Toggle single table expand/collapse
     window.toggleTable = (tableNum) => {
       if (expandedTables.has(tableNum)) {
         expandedTables.delete(tableNum);
@@ -270,6 +235,7 @@
       renderApp();
     };
 
+    // Expand or collapse all tables at once
     window.toggleAllTables = () => {
       const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
       const uniqueTables = [...new Set(guestArray.map(g => g.table))];
@@ -284,6 +250,7 @@
       renderApp();
     };
 
+    // Render the user interface
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
@@ -293,21 +260,24 @@
       const seatedCount = guestArray.filter(g => g.seated).length;
       const progressPercent = totalCount > 0 ? Math.round((seatedCount / totalCount) * 100) : 0;
 
+      // Update counters
       document.getElementById('totalGuests').textContent = totalCount;
       document.getElementById('seatedGuests').textContent = seatedCount;
       
       const uniqueTables = [...new Set(guestArray.map(g => g.table))];
       document.getElementById('totalTables').textContent = uniqueTables.length;
 
+      // Update progress bar
       document.getElementById('progressRatio').textContent = `${seatedCount} من ${totalCount} (${progressPercent}%)`;
       document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
 
-      // Update Expand/Collapse All Button Text
+      // Update Expand/Collapse button label
       const toggleBtn = document.getElementById('toggleAllBtn');
       if (toggleBtn) {
         toggleBtn.textContent = allExpandedState ? 'طي الكل' : 'توسيع الكل';
       }
 
+      // Group guests by table
       const grouped = {};
       guestArray.forEach(g => {
         const matchSearch = g.name.toLowerCase().includes(query) || g.table.toLowerCase().includes(query);
@@ -317,9 +287,7 @@
         }
       });
 
-      // Automatically expand tables when typing in the search box
       const isSearching = query.length > 0;
-
       const sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
 
       if (sortedTables.length === 0) {
@@ -354,9 +322,6 @@
         `;
       }).join('');
     };
-
-    window.openModal = () => document.getElementById('guestModal').classList.add('active');
-    window.closeModal = () => document.getElementById('guestModal').classList.remove('active');
   </script>
 </body>
 </html>
