@@ -39,15 +39,20 @@
       text-overflow: ellipsis;
     }
 
-    /* Compact Top Statistics Cards */
-    .stats-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+    /* Enhanced Top Statistics Cards Grid */
+    .stats-bar { 
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 8px; 
+      margin-bottom: 14px; 
+    }
     .stat-card {
-      flex: 1; background: var(--card-bg); border: 1px solid var(--border-color);
-      padding: 6px 8px; border-radius: 8px; text-align: center;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      padding: 8px 4px; border-radius: 8px; text-align: center;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
-    .stat-card .num { font-size: 1.25rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
-    .stat-card .label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .stat-card .num { font-size: 1.2rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
+    .stat-card .label { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
 
     /* Attendance Progress Bar */
     .progress-card {
@@ -139,23 +144,28 @@
 
     .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
     
-    /* Guest details & visitor count tag */
-    .guest-info { display: flex; align-items: center; gap: 10px; }
-    .guest-name { font-size: 1rem; font-weight: 500; }
-    .visitor-count-badge {
+    /* Guest Info & Dynamic Visitor Select Dropdown */
+    .guest-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .guest-name { font-size: 0.95rem; font-weight: 500; }
+    
+    .count-select {
       background-color: #334155;
       color: #38bdf8;
       border: 1px solid #475569;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 12px;
-      white-space: nowrap;
+      padding: 4px 6px;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+    }
+    .count-select:focus {
+      border-color: var(--primary);
     }
 
     .check-btn {
       background-color: #334155; color: var(--text-muted); border: none;
-      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
     }
     .check-btn.seated {
       background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
@@ -180,15 +190,19 @@
       <h1>Mohammad & Yasmine</h1>
     </header>
 
-    <!-- Top Statistics Summary -->
+    <!-- Top Statistics Summary (4 Metrics) -->
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="totalGuests">0</div>
-        <div class="label">إجمالي الأشخاص</div>
+        <div class="label">إجمالي المدعوين</div>
       </div>
       <div class="stat-card">
         <div class="num" id="seatedGuests" style="color: var(--success);">0</div>
         <div class="label">الحاضرون</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="pendingGuests" style="color: var(--warning);">0</div>
+        <div class="label">المتبقون</div>
       </div>
       <div class="stat-card">
         <div class="num" id="totalTables">0</div>
@@ -199,7 +213,7 @@
     <!-- Attendance Progress Bar -->
     <div class="progress-card">
       <div class="progress-header">
-        <span>الحاضرون من إجمالي الضيوف</span>
+        <span>نسبة الحضور المباشرة</span>
         <span id="progressRatio">0 / 0 (0%)</span>
       </div>
       <div class="progress-track">
@@ -266,6 +280,12 @@
       update(guestRef, { seated: !currentGuests[id].seated });
     };
 
+    // Update guest visitor count directly in Firebase
+    window.updateGuestCount = (id, newCount) => {
+      const guestRef = ref(db, `guests/${id}`);
+      update(guestRef, { count: parseInt(newCount, 10) });
+    };
+
     // Toggle single table expand/collapse
     window.toggleTable = (tableNum) => {
       if (expandedTables.has(tableNum)) {
@@ -304,17 +324,19 @@
       const guestArray = Object.keys(currentGuests).map(id => ({ 
         id, 
         ...currentGuests[id],
-        count: Number(currentGuests[id].count) || 1 // Defaults to 1 if not specified in DB
+        count: Number(currentGuests[id].count) || 1
       }));
 
-      // Total individuals sum up according to guest count field
+      // Calculate statistics
       const totalCount = guestArray.reduce((acc, g) => acc + g.count, 0);
       const seatedCount = guestArray.filter(g => g.seated).reduce((acc, g) => acc + g.count, 0);
+      const pendingCount = totalCount - seatedCount;
       const progressPercent = totalCount > 0 ? Math.round((seatedCount / totalCount) * 100) : 0;
 
-      // Update counters
+      // Update counter cards
       document.getElementById('totalGuests').textContent = totalCount;
       document.getElementById('seatedGuests').textContent = seatedCount;
+      document.getElementById('pendingGuests').textContent = pendingCount;
       
       const uniqueTables = [...new Set(guestArray.map(g => g.table))];
       document.getElementById('totalTables').textContent = uniqueTables.length;
@@ -382,7 +404,13 @@
                 <div class="guest-item">
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
-                    <span class="visitor-count-badge">${g.count} ${g.count > 1 ? 'أشخاص' : 'شخص'}</span>
+                    <select class="count-select" onclick="event.stopPropagation()" onchange="updateGuestCount('${g.id}', this.value)">
+                      ${[1, 2, 3, 4, 5, 6, 7].map(num => `
+                        <option value="${num}" ${num === g.count ? 'selected' : ''}>
+                          ${num} ${num > 1 ? 'أشخاص' : 'شخص'}
+                        </option>
+                      `).join('')}
+                    </select>
                   </div>
                   <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}')">
                     ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
