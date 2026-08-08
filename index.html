@@ -138,7 +138,20 @@
     .table-card.expanded .guest-list { display: flex; }
 
     .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
+    
+    /* Guest details & visitor count tag */
+    .guest-info { display: flex; align-items: center; gap: 10px; }
     .guest-name { font-size: 1rem; font-weight: 500; }
+    .visitor-count-badge {
+      background-color: #334155;
+      color: #38bdf8;
+      border: 1px solid #475569;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
 
     .check-btn {
       background-color: #334155; color: var(--text-muted); border: none;
@@ -171,7 +184,7 @@
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="totalGuests">0</div>
-        <div class="label">إجمالي الضيوف</div>
+        <div class="label">إجمالي الأشخاص</div>
       </div>
       <div class="stat-card">
         <div class="num" id="seatedGuests" style="color: var(--success);">0</div>
@@ -288,10 +301,15 @@
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
-      const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
+      const guestArray = Object.keys(currentGuests).map(id => ({ 
+        id, 
+        ...currentGuests[id],
+        count: Number(currentGuests[id].count) || 1 // Defaults to 1 if not specified in DB
+      }));
 
-      const totalCount = guestArray.length;
-      const seatedCount = guestArray.filter(g => g.seated).length;
+      // Total individuals sum up according to guest count field
+      const totalCount = guestArray.reduce((acc, g) => acc + g.count, 0);
+      const seatedCount = guestArray.filter(g => g.seated).reduce((acc, g) => acc + g.count, 0);
       const progressPercent = totalCount > 0 ? Math.round((seatedCount / totalCount) * 100) : 0;
 
       // Update counters
@@ -344,22 +362,28 @@
 
       listContainer.innerHTML = sortedTables.map(tableNum => {
         const isExpanded = isSearching || expandedTables.has(tableNum);
-        const totalInTable = currentGuests ? Object.values(currentGuests).filter(g => g.table === tableNum).length : grouped[tableNum].length;
-        const seatedInTable = currentGuests ? Object.values(currentGuests).filter(g => g.table === tableNum && g.seated).length : 0;
+        
+        // Sum guests for current table
+        const allTableGuests = guestArray.filter(g => g.table === tableNum);
+        const totalInTable = allTableGuests.reduce((acc, g) => acc + g.count, 0);
+        const seatedInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.count, 0);
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} ضيوف</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} أشخاص</span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
             <div class="guest-list">
               ${grouped[tableNum].map(g => `
                 <div class="guest-item">
-                  <span class="guest-name">${g.name}</span>
+                  <div class="guest-info">
+                    <span class="guest-name">${g.name}</span>
+                    <span class="visitor-count-badge">${g.count} ${g.count > 1 ? 'أشخاص' : 'شخص'}</span>
+                  </div>
                   <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}')">
                     ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
                   </button>
