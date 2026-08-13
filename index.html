@@ -2,8 +2,19 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mohammad & Yasmine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mohammad & Yasmine - Reception</title>
+
+  <!-- Prevent Stale Cache on iOS Bookmarks & Android Shortcuts -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- PWA & Mobile Viewport Safeguards -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+
   <style>
     :root {
       --bg-color: #0f172a;
@@ -12,250 +23,141 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --primary: #6366f1;
-      --primary-hover: #4f46e5;
       --success: #10b981;
       --warning: #f59e0b;
+      --danger: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); padding: 16px; min-height: 100vh; }
-    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; min-height: calc(100vh - 32px); }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 12px; min-height: 100vh; }
+    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; }
 
-    header {
+    /* Offline / Online Status Banner */
+    .connection-banner {
+      background-color: var(--danger);
+      color: white;
       text-align: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border-color);
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
+    .connection-banner.online {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .connection-banner.offline {
+      background-color: rgba(239, 68, 68, 0.9);
+      color: #ffffff;
+      border: 1px solid var(--danger);
+      display: block;
+    }
+
+    header { text-align: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
     header h1 {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 800;
-      letter-spacing: 0.5px;
       background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    /* 4 Statistics Cards Bar */
-    .stats-bar { 
-      display: grid; 
-      grid-template-columns: repeat(4, 1fr); 
-      gap: 8px; 
-      margin-bottom: 14px; 
-    }
+    /* Stats Bar */
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
     .stat-card {
       background: var(--card-bg); border: 1px solid var(--border-color);
       padding: 8px 4px; border-radius: 8px; text-align: center;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
-    .stat-card .num { font-size: 1.2rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
-    .stat-card .label { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
+    .stat-card .num { font-size: 1.1rem; font-weight: bold; color: #ffffff; }
+    .stat-card .label { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* Attendance Progress Bar */
+    /* Progress Bar */
     .progress-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;
     }
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-    .progress-header span:first-child { font-weight: 600; color: var(--text-main); }
-    .progress-track {
-      width: 100%;
-      height: 8px;
-      background-color: var(--bg-color);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #10b981, #34d399);
-      border-radius: 6px;
-      transition: width 0.4s ease-in-out;
-    }
+    .progress-header { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+    .progress-track { width: 100%; height: 8px; background-color: var(--bg-color); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.3s ease; }
 
-    /* Controls Layout */
-    .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .search-box { width: 100%; }
-    
-    /* High-Contrast Highlighted Search Bar */
+    /* Controls */
+    .controls { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
     input[type="text"] {
-      width: 100%; 
-      padding: 12px 14px; 
-      background-color: #172554;
-      border: 2px solid #38bdf8; 
-      border-radius: 8px; 
-      color: #ffffff;
-      font-size: 1rem; 
-      outline: none;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
-      transition: all 0.2s ease-in-out;
+      width: 100%; padding: 12px; background-color: #172554;
+      border: 2px solid #38bdf8; border-radius: 8px; color: #ffffff;
+      font-size: 1rem; outline: none;
     }
-    input[type="text"]::placeholder {
-      color: #93c5fd;
-    }
-    input[type="text"]:focus { 
-      border-color: #818cf8; 
-      box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
-    }
+    input[type="text"]::placeholder { color: #93c5fd; }
 
-    /* Single Line Action Buttons Layout */
-    .action-buttons { 
-      display: flex; 
-      gap: 6px; 
-      flex-wrap: nowrap; 
-      width: 100%;
-    }
+    .action-buttons { display: flex; gap: 6px; width: 100%; }
     .btn {
-      flex: 1; 
-      min-width: 0; 
-      background-color: var(--primary); 
-      color: white; 
-      border: none;
-      padding: 10px 4px; 
-      border-radius: 8px; 
-      font-size: 0.78rem; 
-      font-weight: 600; 
-      cursor: pointer;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      flex: 1; background-color: var(--primary); color: white; border: none;
+      padding: 8px 4px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
     }
     .btn-secondary { background-color: #334155; color: var(--text-main); }
     .btn-filter { background-color: #334155; color: var(--text-muted); border: 1px solid var(--border-color); }
-    .btn-filter.active { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: rgba(245, 158, 11, 0.5); }
+    .btn-filter.active { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: var(--warning); }
 
-    .tables-list { display: flex; flex-direction: column; gap: 14px; flex-grow: 1; }
-    .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
-    
+    /* Tables & Guest Cards */
+    .tables-list { display: flex; flex-direction: column; gap: 10px; }
+    .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
     .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      cursor: pointer;
-      user-select: none;
-      background-color: var(--card-bg);
-      transition: background-color 0.2s;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 14px; cursor: pointer; background-color: var(--card-bg);
     }
-    .table-header:hover { background-color: rgba(255, 255, 255, 0.03); }
-    .table-badge { background: #312e81; color: #a5b4fc; padding: 4px 12px; border-radius: 20px; font-size: 1rem; font-weight: bold; }
-
-    .table-header-info { display: flex; align-items: center; gap: 10px; }
-    .chevron-icon {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      transition: transform 0.3s ease;
-    }
-    .table-card.expanded .chevron-icon { transform: rotate(180deg); }
-
-    .guest-list {
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      padding: 0 16px 16px 16px;
-      border-top: 1px dashed var(--border-color);
-      margin-top: 4px;
-      padding-top: 12px;
-    }
+    .table-badge { background: #312e81; color: #a5b4fc; padding: 3px 10px; border-radius: 12px; font-weight: bold; font-size: 0.9rem; }
+    .guest-list { display: none; flex-direction: column; gap: 6px; padding: 10px; border-top: 1px dashed var(--border-color); }
     .table-card.expanded .guest-list { display: flex; }
 
-    .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
-    
-    /* Guest Info & Visitors Dropdown */
-    .guest-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .guest-name { font-size: 0.95rem; font-weight: 500; }
+    .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 6px; }
+    .guest-info { display: flex; align-items: center; gap: 8px; }
+    .guest-name { font-size: 0.9rem; font-weight: 500; }
     
     .visitor-select {
-      background-color: #334155;
-      color: #38bdf8;
-      border: 1px solid #475569;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 8px;
-      outline: none;
-      cursor: pointer;
-      text-align: center;
+      background-color: #334155; color: #38bdf8; border: 1px solid #475569;
+      font-size: 0.85rem; font-weight: bold; padding: 3px 6px; border-radius: 6px; outline: none;
     }
-    .visitor-select:focus { border-color: var(--primary); }
 
     .check-btn {
       background-color: #334155; color: var(--text-muted); border: none;
-      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+      padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
     }
-    .check-btn.seated {
-      background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
-    }
+    .check-btn.seated { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* Footer Styles */
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      padding: 16px 0;
-      border-top: 1px solid var(--border-color);
-      color: var(--text-muted);
-      font-size: 0.82rem;
-      direction: ltr;
-    }
+    footer { text-align: center; margin-top: 24px; padding: 12px 0; color: var(--text-muted); font-size: 0.75rem; direction: ltr; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Header Section -->
+    <div id="connectionStatus" class="connection-banner">▲ انقطع الاتصال - التعديلات محفوظة محلياً وسوف تتزامن فور عودة الشبكة</div>
+
     <header>
       <h1>Mohammad & Yasmine</h1>
     </header>
 
-    <!-- Top Statistics Summary -->
     <div class="stats-bar">
-      <div class="stat-card">
-        <div class="num" id="totalGuests">0</div>
-        <div class="label">المدعوون</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="seatedGuests" style="color: var(--success);">0</div>
-        <div class="label">الحاضرون</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="seatedVisitors" style="color: #38bdf8;">0</div>
-        <div class="label">عدد الأشخاص</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="totalTables">0</div>
-        <div class="label">عدد الطاولات</div>
-      </div>
+      <div class="stat-card"><div class="num" id="totalGuests">0</div><div class="label">المدعوون</div></div>
+      <div class="stat-card"><div class="num" id="seatedGuests" style="color: var(--success);">0</div><div class="label">الحاضرون</div></div>
+      <div class="stat-card"><div class="num" id="seatedVisitors" style="color: #38bdf8;">0</div><div class="label">الأشخاص</div></div>
+      <div class="stat-card"><div class="num" id="totalTables">0</div><div class="label">الطاولات</div></div>
     </div>
 
-    <!-- Attendance Progress Bar -->
     <div class="progress-card">
       <div class="progress-header">
-        <span>الحاضرون من المدعوين</span>
+        <span>نسبة الحضور</span>
         <span id="progressRatio">0 / 0 (0%)</span>
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressBarFill"></div>
-      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressBarFill"></div></div>
     </div>
 
-    <!-- Search Box & Action Controls -->
     <div class="controls">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ابحث باسم الضيف أو رقم الطاولة..." oninput="renderApp()">
-      </div>
+      <input type="text" id="searchInput" placeholder="ابحث باسم الضيف أو رقم الطاولة..." oninput="renderApp()">
       <div class="action-buttons">
         <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
         <button class="btn btn-filter" id="filterAbsentBtn" onclick="toggleAbsentFilter()">الغائبين فقط</button>
@@ -263,18 +165,23 @@
       </div>
     </div>
 
-    <!-- Main Dynamic Tables List -->
     <div class="tables-list" id="tablesList">
-      <div style="text-align:center; padding:30px; color:var(--text-muted);">جاري تحميل البيانات المباشرة...</div>
+      <div style="text-align:center; padding:20px; color:var(--text-muted);">جاري الاتصال بقاعدة البيانات...</div>
     </div>
 
-    <!-- Footer Section -->
-    <footer>
-      Copyright © Imad Al Wardany +96179104792
-    </footer>
+    <footer>Copyright © Imad Al Wardany +96179104792</footer>
   </div>
 
-  <!-- Firebase Integration Script -->
+  <!-- Force Removal of Stale Service Worker Caches for Bookmarks -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let r of registrations) r.unregister();
+      });
+    }
+  </script>
+
+  <!-- Firebase RTDB Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -299,84 +206,93 @@
     let showOnlyAbsent = false;
     let showOnlyIncomplete = false;
 
-    // Listen for live database updates
+    // Monitor Network Connection State
+    const connectedRef = ref(db, ".info/connected");
+    const statusBanner = document.getElementById("connectionStatus");
+
+    onValue(connectedRef, (snap) => {
+      if (snap.val() === true) {
+        statusBanner.className = "connection-banner online";
+        statusBanner.textContent = "● متصل - التحديثات المباشرة مفعلة";
+        setTimeout(() => { statusBanner.style.display = "none"; }, 2500);
+      } else {
+        statusBanner.className = "connection-banner offline";
+        statusBanner.textContent = "▲ انقطع الاتصال - التعديلات محفوظة محلياً وسوف تتزامن فور عودة الشبكة";
+        statusBanner.style.display = "block";
+      }
+    });
+
+    // Real-time synchronization stream
     onValue(guestsRef, (snapshot) => {
-      const data = snapshot.val();
-      currentGuests = data || {};
+      currentGuests = snapshot.val() || {};
       renderApp();
     });
 
-    // Toggle guest check-in status
-    window.toggleSeated = (id) => {
-      const guestRef = ref(db, `guests/${id}`);
-      update(guestRef, { seated: !currentGuests[id].seated });
+    // Offline-Resilient & Anti-Crash Toggle
+    window.toggleSeated = (id, btnElement) => {
+      if (btnElement) btnElement.disabled = true;
+      
+      const currentStatus = currentGuests[id]?.seated || false;
+      const nextStatus = !currentStatus;
+
+      // Optimistic Local Update (Instant UI responsiveness)
+      if (currentGuests[id]) currentGuests[id].seated = nextStatus;
+      renderApp();
+
+      // Non-blocking Firebase write (Queues automatically if offline)
+      update(ref(db, `guests/${id}`), { seated: nextStatus })
+        .catch(err => console.error("Write queued locally:", err))
+        .finally(() => { if (btnElement) btnElement.disabled = false; });
     };
 
-    // Update guest visitors count in Firebase
+    // Offline-Resilient Visitor Count Update
     window.updateVisitorsCount = (id, count) => {
-      const guestRef = ref(db, `guests/${id}`);
-      update(guestRef, { visitors: parseInt(count, 10) });
+      const parsedCount = parseInt(count, 10) || 1;
+      
+      // Optimistic Local Update
+      if (currentGuests[id]) currentGuests[id].visitors = parsedCount;
+      renderApp();
+
+      // Non-blocking Firebase write
+      update(ref(db, `guests/${id}`), { visitors: parsedCount })
+        .catch(err => console.error("Visitor count queued locally:", err));
     };
 
-    // Toggle single table expand/collapse
     window.toggleTable = (tableNum) => {
-      if (expandedTables.has(tableNum)) {
-        expandedTables.delete(tableNum);
-      } else {
-        expandedTables.add(tableNum);
-      }
+      if (expandedTables.has(tableNum)) expandedTables.delete(tableNum);
+      else expandedTables.add(tableNum);
       renderApp();
     };
 
-    // Expand or collapse all tables at once
     window.toggleAllTables = () => {
-      const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
-      const uniqueTables = [...new Set(guestArray.map(g => g.table))];
-
+      const allTables = [...new Set(Object.values(currentGuests).map(g => g.table))];
       if (allExpandedState) {
         expandedTables.clear();
         allExpandedState = false;
       } else {
-        uniqueTables.forEach(t => expandedTables.add(t));
+        allTables.forEach(t => expandedTables.add(t));
         allExpandedState = true;
       }
       renderApp();
     };
 
-    // Toggle non-attended visitors filter
-    window.toggleAbsentFilter = () => {
-      showOnlyAbsent = !showOnlyAbsent;
-      renderApp();
-    };
+    window.toggleAbsentFilter = () => { showOnlyAbsent = !showOnlyAbsent; renderApp(); };
+    window.toggleIncompleteFilter = () => { showOnlyIncomplete = !showOnlyIncomplete; renderApp(); };
 
-    // Toggle incomplete tables filter
-    window.toggleIncompleteFilter = () => {
-      showOnlyIncomplete = !showOnlyIncomplete;
-      renderApp();
-    };
-
-    // Render the user interface
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
       const guestArray = Object.keys(currentGuests).map(id => ({
         id,
         ...currentGuests[id],
-        visitors: Number(currentGuests[id].visitors) || 0
+        visitors: Number(currentGuests[id].visitors) || 1
       }));
 
-      // Main Guests Counters
       const totalGuestsCount = guestArray.length;
       const seatedGuestsCount = guestArray.filter(g => g.seated).length;
-
-      // Sum of visitors for seated guests
-      const seatedVisitorsCount = guestArray
-        .filter(g => g.seated)
-        .reduce((acc, g) => acc + g.visitors, 0);
-
+      const seatedVisitorsCount = guestArray.filter(g => g.seated).reduce((acc, g) => acc + g.visitors, 0);
       const progressPercent = totalGuestsCount > 0 ? Math.round((seatedGuestsCount / totalGuestsCount) * 100) : 0;
 
-      // Update Top Stat Cards
       document.getElementById('totalGuests').textContent = totalGuestsCount;
       document.getElementById('seatedGuests').textContent = seatedGuestsCount;
       document.getElementById('seatedVisitors').textContent = seatedVisitorsCount;
@@ -384,42 +300,22 @@
       const uniqueTables = [...new Set(guestArray.map(g => g.table))];
       document.getElementById('totalTables').textContent = uniqueTables.length;
 
-      // Update progress bar
       document.getElementById('progressRatio').textContent = `${seatedGuestsCount} من ${totalGuestsCount} (${progressPercent}%)`;
       document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
 
-      // Update buttons UI
-      const toggleBtn = document.getElementById('toggleAllBtn');
-      if (toggleBtn) {
-        toggleBtn.textContent = allExpandedState ? 'طي الكل' : 'توسيع الكل';
-      }
+      document.getElementById('toggleAllBtn').textContent = allExpandedState ? 'طي الكل' : 'توسيع الكل';
 
       const absentBtn = document.getElementById('filterAbsentBtn');
-      if (absentBtn) {
-        if (showOnlyAbsent) {
-          absentBtn.classList.add('active');
-          absentBtn.textContent = '✕ الغائبين';
-        } else {
-          absentBtn.classList.remove('active');
-          absentBtn.textContent = 'الغائبين فقط';
-        }
-      }
+      absentBtn.classList.toggle('active', showOnlyAbsent);
+      absentBtn.textContent = showOnlyAbsent ? '✕ الغائبين' : 'الغائبين فقط';
 
       const incompleteBtn = document.getElementById('filterIncompleteBtn');
-      if (incompleteBtn) {
-        if (showOnlyIncomplete) {
-          incompleteBtn.classList.add('active');
-          incompleteBtn.textContent = '✕ غير مكتملة';
-        } else {
-          incompleteBtn.classList.remove('active');
-          incompleteBtn.textContent = 'غير مكتملة';
-        }
-      }
+      incompleteBtn.classList.toggle('active', showOnlyIncomplete);
+      incompleteBtn.textContent = showOnlyIncomplete ? '✕ غير مكتملة' : 'غير مكتملة';
 
-      // Group and filter guests
       const grouped = {};
       guestArray.forEach(g => {
-        const matchSearch = g.name.toLowerCase().includes(query) || g.table.toLowerCase().includes(query);
+        const matchSearch = g.name.toLowerCase().includes(query) || String(g.table).toLowerCase().includes(query);
         const matchAbsent = !showOnlyAbsent || !g.seated;
 
         if (matchSearch && matchAbsent) {
@@ -428,43 +324,37 @@
         }
       });
 
-      const isSearching = query.length > 0;
-      let sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+      let sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
-      // Filter for incomplete tables if filter is enabled
       if (showOnlyIncomplete) {
         sortedTables = sortedTables.filter(tableNum => {
-          const allTableGuests = guestArray.filter(g => g.table === tableNum);
-          const totalVisitorsInTable = allTableGuests.reduce((acc, g) => acc + g.visitors, 0);
-          const seatedVisitorsInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.visitors, 0);
-          return totalVisitorsInTable !== seatedVisitorsInTable;
+          const tableGuests = guestArray.filter(g => g.table === tableNum);
+          return tableGuests.some(g => !g.seated);
         });
       }
 
       if (sortedTables.length === 0) {
-        listContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد نتائج مطابقة</div>`;
+        listContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد نتائج مطابقة</div>`;
         return;
       }
 
+      const isSearching = query.length > 0;
+
       listContainer.innerHTML = sortedTables.map(tableNum => {
         const isExpanded = isSearching || expandedTables.has(tableNum);
-        
-        const allTableGuests = guestArray.filter(g => g.table === tableNum);
-        
-        // Sum of all visitors on the table
-        const totalVisitorsInTable = allTableGuests.reduce((acc, g) => acc + g.visitors, 0);
-        // Sum of visitors for seated guests on the table
-        const seatedVisitorsInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.visitors, 0);
+        const tableGuests = guestArray.filter(g => g.table === tableNum);
+        const totalVisitors = tableGuests.reduce((acc, g) => acc + g.visitors, 0);
+        const seatedVisitors = tableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.visitors, 0);
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
-              <div class="table-header-info">
-                <span style="font-size:0.85rem; color:#38bdf8; font-weight: 600;">
-                  (${totalVisitorsInTable}/${seatedVisitorsInTable})
+              <div>
+                <span style="font-size:0.85rem; color:#38bdf8; font-weight:bold; margin-left:6px;">
+                  (${seatedVisitors}/${totalVisitors})
                 </span>
-                <span class="chevron-icon">▼</span>
+                <span style="font-size:0.75rem; color:var(--text-muted);">▼</span>
               </div>
             </div>
             <div class="guest-list">
@@ -473,14 +363,12 @@
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
                     <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
-                      ${[1, 2, 3, 4, 5, 6, 7].map(num => `
-                        <option value="${num}" ${num === g.visitors ? 'selected' : ''}>
-                          ${num}
-                        </option>
+                      ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `
+                        <option value="${n}" ${n === g.visitors ? 'selected' : ''}>${n}</option>
                       `).join('')}
                     </select>
                   </div>
-                  <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}')">
+                  <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}', this)">
                     ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
                   </button>
                 </div>
