@@ -115,18 +115,49 @@
     .guest-list { display: none; flex-direction: column; gap: 6px; padding: 10px; border-top: 1px dashed var(--border-color); }
     .table-card.expanded .guest-list { display: flex; }
 
-    .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 6px; }
-    .guest-info { display: flex; align-items: center; gap: 8px; }
+    .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 6px; gap: 8px; }
+    .guest-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .guest-name { font-size: 0.9rem; font-weight: 500; }
     
-    .visitor-select {
-      background-color: #334155; color: #38bdf8; border: 1px solid #475569;
-      font-size: 0.85rem; font-weight: bold; padding: 3px 6px; border-radius: 6px; outline: none;
+    /* Stepper Counter Controls (- nb +) */
+    .counter-control {
+      display: inline-flex;
+      align-items: center;
+      background-color: #334155;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      overflow: hidden;
+      user-select: none;
+    }
+    .counter-btn {
+      background: transparent;
+      color: #38bdf8;
+      border: none;
+      padding: 3px 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .counter-btn:disabled {
+      color: #64748b;
+      cursor: not-allowed;
+    }
+    .counter-btn:active:not(:disabled) {
+      background-color: rgba(56, 189, 248, 0.2);
+    }
+    .counter-value {
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 0 4px;
+      min-width: 20px;
+      text-align: center;
     }
 
     .check-btn {
       background-color: #334155; color: var(--text-muted); border: none;
-      padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap;
     }
     .check-btn.seated { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
 
@@ -135,7 +166,7 @@
 </head>
 <body>
   <div class="container">
-    <div id="connectionStatus" class="connection-banner">▲ انقطع الاتصال - بدنا نرووووووووووق</div>
+    <div id="connectionStatus" class="connection-banner">▲ انقطع الاتصال - التعديلات محفوظة محلياً وسوف تتزامن فور عودة الشبكة</div>
 
     <header>
       <h1>Mohammad & Yasmine</h1>
@@ -213,11 +244,11 @@
     onValue(connectedRef, (snap) => {
       if (snap.val() === true) {
         statusBanner.className = "connection-banner online";
-        statusBanner.textContent = "● متصل - اهلا وسهلا بالزوّار";
+        statusBanner.textContent = "● متصل - التحديثات المباشرة مفعلة";
         setTimeout(() => { statusBanner.style.display = "none"; }, 2500);
       } else {
         statusBanner.className = "connection-banner offline";
-        statusBanner.textContent = "▲ انقطع الاتصال - بدنا نروووووووق";
+        statusBanner.textContent = "▲ انقطع الاتصال - التعديلات محفوظة محلياً وسوف تتزامن فور عودة الشبكة";
         statusBanner.style.display = "block";
       }
     });
@@ -235,26 +266,28 @@
       const currentStatus = currentGuests[id]?.seated || false;
       const nextStatus = !currentStatus;
 
-      // Optimistic Local Update (Instant UI responsiveness)
+      // Optimistic Local Update
       if (currentGuests[id]) currentGuests[id].seated = nextStatus;
       renderApp();
 
-      // Non-blocking Firebase write (Queues automatically if offline)
+      // Non-blocking Firebase write
       update(ref(db, `guests/${id}`), { seated: nextStatus })
         .catch(err => console.error("Write queued locally:", err))
         .finally(() => { if (btnElement) btnElement.disabled = false; });
     };
 
-    // Offline-Resilient Visitor Count Update
-    window.updateVisitorsCount = (id, count) => {
-      const parsedCount = parseInt(count, 10) || 1;
-      
+    // Incremental Stepper Update (+ / -)
+    window.changeVisitorCount = (id, delta) => {
+      const current = Number(currentGuests[id]?.visitors) || 1;
+      const nextCount = Math.max(1, current + delta); // Prevents going below 1
+      if (nextCount === current) return;
+
       // Optimistic Local Update
-      if (currentGuests[id]) currentGuests[id].visitors = parsedCount;
+      if (currentGuests[id]) currentGuests[id].visitors = nextCount;
       renderApp();
 
       // Non-blocking Firebase write
-      update(ref(db, `guests/${id}`), { visitors: parsedCount })
+      update(ref(db, `guests/${id}`), { visitors: nextCount })
         .catch(err => console.error("Visitor count queued locally:", err));
     };
 
@@ -362,11 +395,11 @@
                 <div class="guest-item">
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
-                    <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
-                      ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `
-                        <option value="${n}" ${n === g.visitors ? 'selected' : ''}>${n}</option>
-                      `).join('')}
-                    </select>
+                    <div class="counter-control" onclick="event.stopPropagation()">
+                      <button class="counter-btn" onclick="changeVisitorCount('${g.id}', -1)" ${g.visitors <= 1 ? 'disabled' : ''}>-</button>
+                      <span class="counter-value">${g.visitors}</span>
+                      <button class="counter-btn" onclick="changeVisitorCount('${g.id}', 1)">+</button>
+                    </div>
                   </div>
                   <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}', this)">
                     ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
