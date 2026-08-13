@@ -152,12 +152,13 @@
       background-color: #334155;
       color: #38bdf8;
       border: 1px solid #475569;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      padding: 4px 6px;
+      padding: 4px 8px;
       border-radius: 8px;
       outline: none;
       cursor: pointer;
+      text-align: center;
     }
     .visitor-select:focus { border-color: var(--primary); }
 
@@ -325,11 +326,11 @@
         visitors: Number(currentGuests[id].visitors) || 0
       }));
 
-      // Main Guests Counters (Independent of visitors)
+      // Main Guests Counters
       const totalGuestsCount = guestArray.length;
       const seatedGuestsCount = guestArray.filter(g => g.seated).length;
 
-      // New Counter: Sum of visitors for seated guests
+      // Sum of visitors for seated guests
       const seatedVisitorsCount = guestArray
         .filter(g => g.seated)
         .reduce((acc, g) => acc + g.visitors, 0);
@@ -407,9 +408,9 @@
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
                     <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
-                      ${[0, 1, 2, 3, 4, 5, 6, 7].map(num => `
+                      ${[1, 2, 3, 4, 5, 6, 7].map(num => `
                         <option value="${num}" ${num === g.visitors ? 'selected' : ''}>
-                          ${num === 0 ? 'بدون مرافقين' : `+${num} ${num > 1 ? 'مرافقين' : 'مرافق'}`}
+                          ${num}
                         </option>
                       `).join('')}
                     </select>
