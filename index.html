@@ -138,11 +138,27 @@
     .table-card.expanded .guest-list { display: flex; }
 
     .guest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 8px; }
-    .guest-name { font-size: 1rem; font-weight: 500; }
+    
+    /* Guest Info & Visitors Dropdown */
+    .guest-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .guest-name { font-size: 0.95rem; font-weight: 500; }
+    
+    .visitor-select {
+      background-color: #334155;
+      color: #38bdf8;
+      border: 1px solid #475569;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 4px 6px;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+    }
+    .visitor-select:focus { border-color: var(--primary); }
 
     .check-btn {
       background-color: #334155; color: var(--text-muted); border: none;
-      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
     }
     .check-btn.seated {
       background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
@@ -253,6 +269,12 @@
       update(guestRef, { seated: !currentGuests[id].seated });
     };
 
+    // Update guest visitors count in Firebase
+    window.updateVisitorsCount = (id, count) => {
+      const guestRef = ref(db, `guests/${id}`);
+      update(guestRef, { visitors: parseInt(count, 10) });
+    };
+
     // Toggle single table expand/collapse
     window.toggleTable = (tableNum) => {
       if (expandedTables.has(tableNum)) {
@@ -288,10 +310,19 @@
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
-      const guestArray = Object.keys(currentGuests).map(id => ({ id, ...currentGuests[id] }));
+      const guestArray = Object.keys(currentGuests).map(id => {
+        const vCount = Number(currentGuests[id].visitors) || 0;
+        return { 
+          id, 
+          ...currentGuests[id],
+          visitors: vCount,
+          totalHeadcount: 1 + vCount // 1 Main Guest + Visitors
+        };
+      });
 
-      const totalCount = guestArray.length;
-      const seatedCount = guestArray.filter(g => g.seated).length;
+      // Calculate Total Individuals (Main Guests + Visitors)
+      const totalCount = guestArray.reduce((acc, g) => acc + g.totalHeadcount, 0);
+      const seatedCount = guestArray.filter(g => g.seated).reduce((acc, g) => acc + g.totalHeadcount, 0);
       const progressPercent = totalCount > 0 ? Math.round((seatedCount / totalCount) * 100) : 0;
 
       // Update counters
@@ -344,22 +375,34 @@
 
       listContainer.innerHTML = sortedTables.map(tableNum => {
         const isExpanded = isSearching || expandedTables.has(tableNum);
-        const totalInTable = currentGuests ? Object.values(currentGuests).filter(g => g.table === tableNum).length : grouped[tableNum].length;
-        const seatedInTable = currentGuests ? Object.values(currentGuests).filter(g => g.table === tableNum && g.seated).length : 0;
+        
+        // Sum total individuals per table
+        const allTableGuests = guestArray.filter(g => g.table === tableNum);
+        const totalInTable = allTableGuests.reduce((acc, g) => acc + g.totalHeadcount, 0);
+        const seatedInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.totalHeadcount, 0);
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} ضيوف</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} أشخاص</span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
             <div class="guest-list">
               ${grouped[tableNum].map(g => `
                 <div class="guest-item">
-                  <span class="guest-name">${g.name}</span>
+                  <div class="guest-info">
+                    <span class="guest-name">${g.name}</span>
+                    <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
+                      ${[0, 1, 2, 3, 4, 5, 6, 7].map(num => `
+                        <option value="${num}" ${num === g.visitors ? 'selected' : ''}>
+                          ${num === 0 ? 'بدون مرافقين' : `+${num} ${num > 1 ? 'مرافقين' : 'مرافق'}`}
+                        </option>
+                      `).join('')}
+                    </select>
+                  </div>
                   <button class="check-btn ${g.seated ? 'seated' : ''}" onclick="event.stopPropagation(); toggleSeated('${g.id}')">
                     ${g.seated ? '✓ تم الجلوس' : 'تأكيد الوصول'}
                   </button>
