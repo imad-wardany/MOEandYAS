@@ -135,7 +135,7 @@
 </head>
 <body>
   <div class="container">
-    <div id="connectionStatus" class="connection-banner">▲ انقطع الاتصال - التعديلات محفوظة محلياً وسوف تتزامن فور عودة الشبكة</div>
+    <div id="connectionStatus" class="connection-banner">▲ انقطع الاتصال - بدنا نرووووووووووق</div>
 
     <header>
       <h1>Mohammad & Yasmine</h1>
@@ -213,11 +213,11 @@
     onValue(connectedRef, (snap) => {
       if (snap.val() === true) {
         statusBanner.className = "connection-banner online";
-        statusBanner.textContent = "● متصل - التحديثات المباشرة مفعلة";
+        statusBanner.textContent = "● متصل - اهلا وسهلا بالزوّار";
         setTimeout(() => { statusBanner.style.display = "none"; }, 2500);
       } else {
         statusBanner.className = "connection-banner offline";
-        statusBanner.textContent = "▲ انقطع الاتصال - التعديلات محفوظة محلياً وسوف تتزامن فور عودة الشبكة";
+        statusBanner.textContent = "▲ انقطع الاتصال - بدنا نروووووووق";
         statusBanner.style.display = "block";
       }
     });
