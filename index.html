@@ -392,13 +392,14 @@
         const allTableGuests = guestArray.filter(g => g.table === tableNum);
         const totalInTable = allTableGuests.length;
         const seatedInTable = allTableGuests.filter(g => g.seated).length;
+        const totalVisitorsInTable = allTableGuests.reduce((acc, g) => acc + g.visitors, 0);
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} مدعوين</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} <span style="color:#38bdf8;">(+${totalVisitorsInTable})</span></span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
@@ -408,7 +409,7 @@
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
                     <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
-                      ${[1, 2, 3, 4, 5, 6, 7].map(num => `
+                      ${[0, 1, 2, 3, 4, 5, 6, 7].map(num => `
                         <option value="${num}" ${num === g.visitors ? 'selected' : ''}>
                           ${num}
                         </option>
