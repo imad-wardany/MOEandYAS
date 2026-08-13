@@ -39,15 +39,20 @@
       text-overflow: ellipsis;
     }
 
-    /* Compact Top Statistics Cards */
-    .stats-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+    /* 4 Statistics Cards Bar */
+    .stats-bar { 
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 8px; 
+      margin-bottom: 14px; 
+    }
     .stat-card {
-      flex: 1; background: var(--card-bg); border: 1px solid var(--border-color);
-      padding: 6px 8px; border-radius: 8px; text-align: center;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      padding: 8px 4px; border-radius: 8px; text-align: center;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
-    .stat-card .num { font-size: 1.25rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
-    .stat-card .label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .stat-card .num { font-size: 1.2rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
+    .stat-card .label { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
 
     /* Attendance Progress Bar */
     .progress-card {
@@ -194,6 +199,10 @@
         <div class="label">الحاضرون</div>
       </div>
       <div class="stat-card">
+        <div class="num" id="seatedVisitors" style="color: #38bdf8;">0</div>
+        <div class="label">عدد الأشخاص</div>
+      </div>
+      <div class="stat-card">
         <div class="num" id="totalTables">0</div>
         <div class="label">عدد الطاولات</div>
       </div>
@@ -310,30 +319,33 @@
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
-      const guestArray = Object.keys(currentGuests).map(id => {
-        const vCount = Number(currentGuests[id].visitors) || 0;
-        return { 
-          id, 
-          ...currentGuests[id],
-          visitors: vCount,
-          totalHeadcount: 1 + vCount // 1 Main Guest + Visitors
-        };
-      });
+      const guestArray = Object.keys(currentGuests).map(id => ({
+        id,
+        ...currentGuests[id],
+        visitors: Number(currentGuests[id].visitors) || 0
+      }));
 
-      // Calculate Total Individuals (Main Guests + Visitors)
-      const totalCount = guestArray.reduce((acc, g) => acc + g.totalHeadcount, 0);
-      const seatedCount = guestArray.filter(g => g.seated).reduce((acc, g) => acc + g.totalHeadcount, 0);
-      const progressPercent = totalCount > 0 ? Math.round((seatedCount / totalCount) * 100) : 0;
+      // Main Guests Counters (Independent of visitors)
+      const totalGuestsCount = guestArray.length;
+      const seatedGuestsCount = guestArray.filter(g => g.seated).length;
 
-      // Update counters
-      document.getElementById('totalGuests').textContent = totalCount;
-      document.getElementById('seatedGuests').textContent = seatedCount;
+      // New Counter: Sum of visitors for seated guests
+      const seatedVisitorsCount = guestArray
+        .filter(g => g.seated)
+        .reduce((acc, g) => acc + g.visitors, 0);
+
+      const progressPercent = totalGuestsCount > 0 ? Math.round((seatedGuestsCount / totalGuestsCount) * 100) : 0;
+
+      // Update Top Stat Cards
+      document.getElementById('totalGuests').textContent = totalGuestsCount;
+      document.getElementById('seatedGuests').textContent = seatedGuestsCount;
+      document.getElementById('seatedVisitors').textContent = seatedVisitorsCount;
       
       const uniqueTables = [...new Set(guestArray.map(g => g.table))];
       document.getElementById('totalTables').textContent = uniqueTables.length;
 
       // Update progress bar
-      document.getElementById('progressRatio').textContent = `${seatedCount} من ${totalCount} (${progressPercent}%)`;
+      document.getElementById('progressRatio').textContent = `${seatedGuestsCount} من ${totalGuestsCount} (${progressPercent}%)`;
       document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
 
       // Update buttons UI
@@ -376,17 +388,16 @@
       listContainer.innerHTML = sortedTables.map(tableNum => {
         const isExpanded = isSearching || expandedTables.has(tableNum);
         
-        // Sum total individuals per table
         const allTableGuests = guestArray.filter(g => g.table === tableNum);
-        const totalInTable = allTableGuests.reduce((acc, g) => acc + g.totalHeadcount, 0);
-        const seatedInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.totalHeadcount, 0);
+        const totalInTable = allTableGuests.length;
+        const seatedInTable = allTableGuests.filter(g => g.seated).length;
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} أشخاص</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} ضيوف</span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
