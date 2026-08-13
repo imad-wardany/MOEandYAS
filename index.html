@@ -97,11 +97,28 @@
     }
     input[type="text"]:focus { border-color: var(--primary); }
 
-    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    /* Single Line Action Buttons Layout */
+    .action-buttons { 
+      display: flex; 
+      gap: 6px; 
+      flex-wrap: nowrap; 
+      width: 100%;
+    }
     .btn {
-      flex: 1; min-width: 120px; background-color: var(--primary); color: white; border: none;
-      padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      flex: 1; 
+      min-width: 0; 
+      background-color: var(--primary); 
+      color: white; 
+      border: none;
+      padding: 10px 4px; 
+      border-radius: 8px; 
+      font-size: 0.78rem; 
+      font-weight: 600; 
+      cursor: pointer;
       text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .btn-secondary { background-color: #334155; color: var(--text-main); }
     .btn-filter { background-color: #334155; color: var(--text-muted); border: 1px solid var(--border-color); }
@@ -227,8 +244,8 @@
       </div>
       <div class="action-buttons">
         <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
-        <button class="btn btn-filter" id="filterAbsentBtn" onclick="toggleAbsentFilter()">عرض الغائبين فقط</button>
-        <button class="btn btn-filter" id="filterIncompleteBtn" onclick="toggleIncompleteFilter()">الطاولات الغير مكتملة</button>
+        <button class="btn btn-filter" id="filterAbsentBtn" onclick="toggleAbsentFilter()">الغائبين فقط</button>
+        <button class="btn btn-filter" id="filterIncompleteBtn" onclick="toggleIncompleteFilter()">غير مكتملة</button>
       </div>
     </div>
 
@@ -367,10 +384,10 @@
       if (absentBtn) {
         if (showOnlyAbsent) {
           absentBtn.classList.add('active');
-          absentBtn.textContent = '✕ عرض الغائبين';
+          absentBtn.textContent = '✕ الغائبين';
         } else {
           absentBtn.classList.remove('active');
-          absentBtn.textContent = 'عرض الغائبين فقط';
+          absentBtn.textContent = 'الغائبين فقط';
         }
       }
 
@@ -378,10 +395,10 @@
       if (incompleteBtn) {
         if (showOnlyIncomplete) {
           incompleteBtn.classList.add('active');
-          incompleteBtn.textContent = '✕ الطاولات الغير مكتملة';
+          incompleteBtn.textContent = '✕ غير مكتملة';
         } else {
           incompleteBtn.classList.remove('active');
-          incompleteBtn.textContent = 'الطاولات الغير مكتملة';
+          incompleteBtn.textContent = 'غير مكتملة';
         }
       }
 
