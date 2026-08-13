@@ -99,8 +99,8 @@
 
     .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn {
-      flex: 1; min-width: 140px; background-color: var(--primary); color: white; border: none;
-      padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      flex: 1; min-width: 120px; background-color: var(--primary); color: white; border: none;
+      padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
       text-align: center;
     }
     .btn-secondary { background-color: #334155; color: var(--text-main); }
@@ -228,6 +228,7 @@
       <div class="action-buttons">
         <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
         <button class="btn btn-filter" id="filterAbsentBtn" onclick="toggleAbsentFilter()">عرض الغائبين فقط</button>
+        <button class="btn btn-filter" id="filterIncompleteBtn" onclick="toggleIncompleteFilter()">الطاولات الغير مكتملة</button>
       </div>
     </div>
 
@@ -265,6 +266,7 @@
     let expandedTables = new Set();
     let allExpandedState = false;
     let showOnlyAbsent = false;
+    let showOnlyIncomplete = false;
 
     // Listen for live database updates
     onValue(guestsRef, (snapshot) => {
@@ -316,6 +318,12 @@
       renderApp();
     };
 
+    // Toggle incomplete tables filter
+    window.toggleIncompleteFilter = () => {
+      showOnlyIncomplete = !showOnlyIncomplete;
+      renderApp();
+    };
+
     // Render the user interface
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -359,10 +367,21 @@
       if (absentBtn) {
         if (showOnlyAbsent) {
           absentBtn.classList.add('active');
-          absentBtn.textContent = '✕ إلغاء الفلتر (عرض الكل)';
+          absentBtn.textContent = '✕ عرض الغائبين';
         } else {
           absentBtn.classList.remove('active');
           absentBtn.textContent = 'عرض الغائبين فقط';
+        }
+      }
+
+      const incompleteBtn = document.getElementById('filterIncompleteBtn');
+      if (incompleteBtn) {
+        if (showOnlyIncomplete) {
+          incompleteBtn.classList.add('active');
+          incompleteBtn.textContent = '✕ الطاولات الغير مكتملة';
+        } else {
+          incompleteBtn.classList.remove('active');
+          incompleteBtn.textContent = 'الطاولات الغير مكتملة';
         }
       }
 
@@ -379,7 +398,17 @@
       });
 
       const isSearching = query.length > 0;
-      const sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+      let sortedTables = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+
+      // Filter for incomplete tables if filter is enabled
+      if (showOnlyIncomplete) {
+        sortedTables = sortedTables.filter(tableNum => {
+          const allTableGuests = guestArray.filter(g => g.table === tableNum);
+          const totalVisitorsInTable = allTableGuests.reduce((acc, g) => acc + g.visitors, 0);
+          const seatedVisitorsInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.visitors, 0);
+          return totalVisitorsInTable !== seatedVisitorsInTable;
+        });
+      }
 
       if (sortedTables.length === 0) {
         listContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد نتائج مطابقة</div>`;
@@ -390,8 +419,6 @@
         const isExpanded = isSearching || expandedTables.has(tableNum);
         
         const allTableGuests = guestArray.filter(g => g.table === tableNum);
-        const totalInTable = allTableGuests.length;
-        const seatedInTable = allTableGuests.filter(g => g.seated).length;
         
         // Sum of all visitors on the table
         const totalVisitorsInTable = allTableGuests.reduce((acc, g) => acc + g.visitors, 0);
@@ -403,9 +430,8 @@
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">
-                  ${seatedInTable}/${totalInTable}
-                  <span style="color:#38bdf8; margin-right: 6px;">(${totalVisitorsInTable}/${seatedVisitorsInTable})</span>
+                <span style="font-size:0.85rem; color:#38bdf8; font-weight: 600;">
+                  (${totalVisitorsInTable}/${seatedVisitorsInTable})
                 </span>
                 <span class="chevron-icon">▼</span>
               </div>
