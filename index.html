@@ -192,7 +192,7 @@
     <div class="stats-bar">
       <div class="stat-card">
         <div class="num" id="totalGuests">0</div>
-        <div class="label">إجمالي الضيوف</div>
+        <div class="label">المدعوون</div>
       </div>
       <div class="stat-card">
         <div class="num" id="seatedGuests" style="color: var(--success);">0</div>
@@ -211,7 +211,7 @@
     <!-- Attendance Progress Bar -->
     <div class="progress-card">
       <div class="progress-header">
-        <span>الحاضرون من إجمالي الضيوف</span>
+        <span>الحاضرون من المدعوين</span>
         <span id="progressRatio">0 / 0 (0%)</span>
       </div>
       <div class="progress-track">
@@ -397,7 +397,7 @@
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} ضيوف</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} مدعوين</span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
@@ -407,9 +407,9 @@
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
                     <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
-                      ${[0, 1, 2, 3, 4, 5, 6, 7].map(num => `
+                      ${[1, 2, 3, 4, 5, 6, 7].map(num => `
                         <option value="${num}" ${num === g.visitors ? 'selected' : ''}>
-                          ${num === 0 ? 'بدون مرافقين' : `+${num} ${num > 1 ? 'مرافقين' : 'مرافق'}`}
+                          ${`+${num} ${num > 1 ? 'مرافقين' : 'مرافق'}`}
                         </option>
                       `).join('')}
                     </select>
