@@ -407,9 +407,9 @@
                   <div class="guest-info">
                     <span class="guest-name">${g.name}</span>
                     <select class="visitor-select" onclick="event.stopPropagation()" onchange="updateVisitorsCount('${g.id}', this.value)">
-                      ${[1, 2, 3, 4, 5, 6, 7].map(num => `
+                      ${[0, 1, 2, 3, 4, 5, 6, 7].map(num => `
                         <option value="${num}" ${num === g.visitors ? 'selected' : ''}>
-                          ${`+${num} ${num > 1 ? 'مرافقين' : 'مرافق'}`}
+                          ${num === 0 ? 'بدون مرافقين' : `+${num} ${num > 1 ? 'مرافقين' : 'مرافق'}`}
                         </option>
                       `).join('')}
                     </select>
