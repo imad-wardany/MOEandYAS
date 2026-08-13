@@ -392,14 +392,21 @@
         const allTableGuests = guestArray.filter(g => g.table === tableNum);
         const totalInTable = allTableGuests.length;
         const seatedInTable = allTableGuests.filter(g => g.seated).length;
+        
+        // Sum of all visitors on the table
         const totalVisitorsInTable = allTableGuests.reduce((acc, g) => acc + g.visitors, 0);
+        // Sum of visitors for seated guests on the table
+        const seatedVisitorsInTable = allTableGuests.filter(g => g.seated).reduce((acc, g) => acc + g.visitors, 0);
 
         return `
           <div class="table-card ${isExpanded ? 'expanded' : ''}">
             <div class="table-header" onclick="toggleTable('${tableNum}')">
               <span class="table-badge">طاولة رقم ${tableNum}</span>
               <div class="table-header-info">
-                <span style="font-size:0.85rem; color:var(--text-muted);">${seatedInTable}/${totalInTable} <span style="color:#38bdf8;">(+${totalVisitorsInTable})</span></span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">
+                  ${seatedInTable}/${totalInTable}
+                  <span style="color:#38bdf8; margin-right: 6px;">(${totalVisitorsInTable}/${seatedVisitorsInTable})</span>
+                </span>
                 <span class="chevron-icon">▼</span>
               </div>
             </div>
