@@ -104,6 +104,18 @@
     .btn-filter { background-color: #334155; color: var(--text-muted); border: 1px solid var(--border-color); }
     .btn-filter.active { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: var(--warning); }
 
+    /* Custom Dropdown Styling */
+    select.btn-filter {
+      text-align: center;
+      text-align-last: center;
+      outline: none;
+      appearance: auto;
+    }
+    select.btn-filter option {
+      background-color: var(--card-bg);
+      color: var(--text-main);
+    }
+
     /* Tables & Guest Cards */
     .tables-list { display: flex; flex-direction: column; gap: 10px; }
     .table-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
@@ -193,6 +205,14 @@
         <button class="btn btn-secondary" id="toggleAllBtn" onclick="toggleAllTables()">توسيع الكل</button>
         <button class="btn btn-filter" id="filterAbsentBtn" onclick="toggleAbsentFilter()">الغائبين فقط</button>
         <button class="btn btn-filter" id="filterIncompleteBtn" onclick="toggleIncompleteFilter()">غير مكتملة</button>
+        <select class="btn btn-filter" id="visitorCountFilter" onchange="renderApp()">
+          <option value="">الكل</option>
+          <option value="7">7 أشخاص</option>
+          <option value="8">8 أشخاص</option>
+          <option value="9">9 أشخاص</option>
+          <option value="10">10 أشخاص</option>
+          <option value="11">11 شخص</option>
+        </select>
       </div>
     </div>
 
@@ -315,6 +335,9 @@
     window.renderApp = () => {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const listContainer = document.getElementById('tablesList');
+      const visitorSelect = document.getElementById('visitorCountFilter');
+      const selectedVisitorCount = visitorSelect ? visitorSelect.value : '';
+
       const guestArray = Object.keys(currentGuests).map(id => ({
         id,
         ...currentGuests[id],
@@ -346,6 +369,10 @@
       incompleteBtn.classList.toggle('active', showOnlyIncomplete);
       incompleteBtn.textContent = showOnlyIncomplete ? '✕ غير مكتملة' : 'غير مكتملة';
 
+      if (visitorSelect) {
+        visitorSelect.classList.toggle('active', selectedVisitorCount !== '');
+      }
+
       const grouped = {};
       guestArray.forEach(g => {
         const matchSearch = g.name.toLowerCase().includes(query) || String(g.table).toLowerCase().includes(query);
@@ -363,6 +390,15 @@
         sortedTables = sortedTables.filter(tableNum => {
           const tableGuests = guestArray.filter(g => g.table === tableNum);
           return tableGuests.some(g => !g.seated);
+        });
+      }
+
+      if (selectedVisitorCount) {
+        const targetCount = Number(selectedVisitorCount);
+        sortedTables = sortedTables.filter(tableNum => {
+          const tableGuests = guestArray.filter(g => g.table === tableNum);
+          const totalVisitors = tableGuests.reduce((acc, g) => acc + g.visitors, 0);
+          return totalVisitors === targetCount;
         });
       }
 
